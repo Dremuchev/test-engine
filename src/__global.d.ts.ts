@@ -22,6 +22,7 @@ declare global {
                 options?: string;
                 dopdownIsOpen?: boolean;
             } & Deafault;
+            'health-menu': {} & Deafault;
         }
     }
 }

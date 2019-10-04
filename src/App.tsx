@@ -1,53 +1,50 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { StyledButton } from './components/default-button/default-button.component';
+import React, { useState } from 'react';
+import { Input } from './components/input/input.components';
+import { CustomMenu } from './components/custom-menu/custom-menu.component';
+import { ToggleMenu } from './components/toggle-menu/toggle-menu.component';
 import styled from 'styled-components';
-import { CustomMouseEvent } from 'hp-engine/dist/types/custom.types';
+import { Switch } from './components/switch/switch.component';
 
-const Container = styled.div`
-    display: flex;
-    justify-content: flex-end;
+const HEALTH_MENU = 'Health menu';
+const TOGGLE_MENU = 'Toggle menu';
+
+const initialValues = { [HEALTH_MENU]: 1, [TOGGLE_MENU]: 1 };
+
+const Wrapper = styled.div`
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
 `;
 
 export const App = () => {
-    const [open, setOpen] = useState(false);
+    const [values, setValues] = useState(initialValues);
 
-    const toggleMenuRef = useRef(null);
-
-    const handleTest = () => console.log('Test method works!');
-
-    const handleItemSelect = (event: CustomEvent<CustomMouseEvent>) => {
-        console.log(event.detail.name);
+    const handleChangeValue = (value: number, name: string) => {
+        initialValues[name] = value;
+        setValues({ ...initialValues });
     };
 
-    useEffect(() => {
-        if (toggleMenuRef.current) {
-            toggleMenuRef.current!.test = handleTest;
-            toggleMenuRef.current!.addEventListener('toggleMenuItemSelect', handleItemSelect);
+    const handleSwitchChange = (checked: boolean) => {
+        console.log('TCL: handleSwitchChange -> checked', checked);
+        if (checked) {
+            document.body.setAttribute('style', '--health-btn-rested-color: #30b6dd');
+        } else {
+            document.body.removeAttribute('style');
         }
-        return () => {
-            toggleMenuRef.current!.removeEventListener('toggleMenuItemSelect', handleItemSelect);
-        };
-    }, []);
-
-    const options = JSON.stringify(['Andrey Dremuchev', 'Andrey Karnaukhov', 'Andrey Bogoroditsky']);
-
-    const handleButtonClick = useCallback(() => {
-        setOpen(!open);
-    }, [open]);
+    };
 
     return (
         <>
-            <StyledButton>Default button</StyledButton>
-            <Container>
-                <health-toggle-menu dopdownIsOpen={open} options={options} ref={toggleMenuRef}>
-                    <health-button
-                        name="Custom button"
-                        type="link"
-                        onClick={handleButtonClick}
-                        slot="toggler"
-                    ></health-button>
-                </health-toggle-menu>
-            </Container>
+            <Switch onChange={handleSwitchChange} />
+            <Wrapper>
+                <Input onChangeValue={handleChangeValue} name={HEALTH_MENU} count={values[HEALTH_MENU]} />
+                <CustomMenu countOfItems={values[HEALTH_MENU]} />
+            </Wrapper>
+            <Wrapper>
+                <Input onChangeValue={handleChangeValue} name={TOGGLE_MENU} count={values[TOGGLE_MENU]} />
+                <ToggleMenu countOfItems={values[TOGGLE_MENU]} />
+            </Wrapper>
         </>
     );
 };
